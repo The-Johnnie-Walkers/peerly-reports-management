@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { ClientsModule } from '@nestjs/microservices';
+import { Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ReportSchemaDefinition } from './infrastructure/adapters/out/persistence/entities/report.schema';
 import { Report } from './domain/entities/report.entity';
@@ -12,11 +14,25 @@ import { CreateReportUseCaseImpl } from './application/use-cases/create-report-u
 import { GetReportUseCaseImpl } from './application/use-cases/get-report-use-case.impl';
 import { GetAllReportsUseCaseImpl } from './application/use-cases/get-all-reports-use-case.impl';
 import { UpdateReportStatusUseCaseImpl } from './application/use-cases/update-report-status-use-case.impl';
+import { UserClientService } from './infrastructure/adapters/out/rabbitmq/user-client.service';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Report.name, schema: ReportSchemaDefinition },
+    ]),
+    ClientsModule.register([
+      {
+        name: 'USER_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost:5672'],
+          queue: 'user_queue',
+          queueOptions: {
+            durable: true,
+          },
+        },
+      },
     ]),
   ],
   providers: [
@@ -24,6 +40,7 @@ import { UpdateReportStatusUseCaseImpl } from './application/use-cases/update-re
     ReportRepository,
     ReportService,
     ReportDtoMapper,
+    UserClientService,
     {
       provide: 'ReportRepositoryOutPortToken',
       useClass: ReportRepositoryAdapter,

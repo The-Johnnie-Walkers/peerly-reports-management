@@ -1,15 +1,17 @@
-import { Controller, Post, Put, Get, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Put, Get, Param, Body, HttpCode, HttpStatus, Headers, ForbiddenException } from '@nestjs/common';
 import { ReportService } from 'src/contexts/report/application/services/report.service';
 import { ReportDtoMapper } from '../mapper/report-dto.mapper';
 import { CreateReportRequestDto } from '../dto/request/create-report-request.dto';
 import { UpdateReportStatusRequestDto } from '../dto/request/update-report-status-request.dto';
 import { ReportResponseDto } from '../dto/response/report-response.dto';
+import { UserClientService } from '../../out/rabbitmq/user-client.service';
 
 @Controller('reports')
 export class ReportController {
   constructor(
     private reportService: ReportService,
     private reportDtoMapper: ReportDtoMapper,
+    private userClientService: UserClientService,
   ) {}
 
   @Post()
@@ -36,25 +38,51 @@ export class ReportController {
   async updateReportStatus(
     @Param('id') id: string,
     @Body() updateStatusDto: UpdateReportStatusRequestDto,
+    @Headers('x-user-id') userId: string,
   ): Promise<ReportResponseDto> {
+    const isAdmin = await this.userClientService.isAdmin(userId);
+    if (!isAdmin) {
+      throw new ForbiddenException('Only admins can update report status');
+    }
     const updatedReport = await this.reportService.updateReportStatus(id, updateStatusDto.status);
     return this.reportDtoMapper.toResponse(updatedReport);
   }
 
   @Put(':id/resolve')
-  async resolveReport(@Param('id') id: string): Promise<ReportResponseDto> {
+  async resolveReport(
+    @Param('id') id: string,
+    @Headers('x-user-id') userId: string,
+  ): Promise<ReportResponseDto> {
+    const isAdmin = await this.userClientService.isAdmin(userId);
+    if (!isAdmin) {
+      throw new ForbiddenException('Only admins can resolve reports');
+    }
     const resolvedReport = await this.reportService.resolveReport(id);
     return this.reportDtoMapper.toResponse(resolvedReport);
   }
 
   @Put(':id/reject')
-  async rejectReport(@Param('id') id: string): Promise<ReportResponseDto> {
+  async rejectReport(
+    @Param('id') id: string,
+    @Headers('x-user-id') userId: string,
+  ): Promise<ReportResponseDto> {
+    const isAdmin = await this.userClientService.isAdmin(userId);
+    if (!isAdmin) {
+      throw new ForbiddenException('Only admins can reject reports');
+    }
     const rejectedReport = await this.reportService.rejectReport(id);
     return this.reportDtoMapper.toResponse(rejectedReport);
   }
 
   @Put(':id/in-progress')
-  async markInProgress(@Param('id') id: string): Promise<ReportResponseDto> {
+  async markInProgress(
+    @Param('id') id: string,
+    @Headers('x-user-id') userId: string,
+  ): Promise<ReportResponseDto> {
+    const isAdmin = await this.userClientService.isAdmin(userId);
+    if (!isAdmin) {
+      throw new ForbiddenException('Only admins can mark reports as in progress');
+    }
     const report = await this.reportService.markInProgress(id);
     return this.reportDtoMapper.toResponse(report);
   }

@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -15,12 +17,22 @@ import { GetReportUseCaseImpl } from './application/use-cases/get-report-use-cas
 import { GetAllReportsUseCaseImpl } from './application/use-cases/get-all-reports-use-case.impl';
 import { UpdateReportStatusUseCaseImpl } from './application/use-cases/update-report-status-use-case.impl';
 import { UserClientService } from './infrastructure/adapters/out/rabbitmq/user-client.service';
+import { JwtHelperService } from './infrastructure/adapters/out/jwt/jwt-helper.service';
 
 @Module({
   imports: [
+    ConfigModule,
     MongooseModule.forFeature([
       { name: Report.name, schema: ReportSchemaDefinition },
     ]),
+    JwtModule.registerAsync({
+      global: true,
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET') ?? 'default-secret-key',
+        signOptions: { expiresIn: '1h' },
+      }),
+      inject: [ConfigService],
+    }),
     ClientsModule.register([
       {
         name: 'USER_SERVICE',
@@ -41,6 +53,7 @@ import { UserClientService } from './infrastructure/adapters/out/rabbitmq/user-c
     ReportService,
     ReportDtoMapper,
     UserClientService,
+    JwtHelperService,
     {
       provide: 'ReportRepositoryOutPortToken',
       useClass: ReportRepositoryAdapter,

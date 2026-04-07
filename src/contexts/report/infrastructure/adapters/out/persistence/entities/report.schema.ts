@@ -28,7 +28,7 @@ export class ReportSchema {
   @Prop({ required: true })
   createdAt: Date;
 
-  @Prop()
+  @Prop({ type: String, nullable: true })
   idInvolvedUser: string | null;
 
   @Prop({ required: true })

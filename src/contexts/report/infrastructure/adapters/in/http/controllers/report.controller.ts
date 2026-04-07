@@ -1,10 +1,11 @@
-import { Controller, Post, Put, Get, Param, Body, HttpCode, HttpStatus, Headers, ForbiddenException } from '@nestjs/common';
+import { Controller, Post, Put, Get, Param, Body, HttpCode, HttpStatus, Headers, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { ReportService } from 'src/contexts/report/application/services/report.service';
 import { ReportDtoMapper } from '../mapper/report-dto.mapper';
 import { CreateReportRequestDto } from '../dto/request/create-report-request.dto';
 import { UpdateReportStatusRequestDto } from '../dto/request/update-report-status-request.dto';
 import { ReportResponseDto } from '../dto/response/report-response.dto';
-import { UserClientService } from '../../out/rabbitmq/user-client.service';
+import { UserClientService } from '../../../out/rabbitmq/user-client.service';
+import { JwtHelperService } from '../../../out/jwt/jwt-helper.service';
 
 @Controller('reports')
 export class ReportController {
@@ -12,6 +13,7 @@ export class ReportController {
     private reportService: ReportService,
     private reportDtoMapper: ReportDtoMapper,
     private userClientService: UserClientService,
+    private jwtHelperService: JwtHelperService,
   ) {}
 
   @Post()
@@ -34,12 +36,20 @@ export class ReportController {
     return this.reportDtoMapper.toResponseList(reports);
   }
 
+  private async getUserIdFromAuth(authHeader: string): Promise<string> {
+    if (!authHeader) {
+      throw new UnauthorizedException('Authorization header is required');
+    }
+    return this.jwtHelperService.extractUserIdFromToken(authHeader);
+  }
+
   @Put(':id/status')
   async updateReportStatus(
     @Param('id') id: string,
     @Body() updateStatusDto: UpdateReportStatusRequestDto,
-    @Headers('x-user-id') userId: string,
+    @Headers('authorization') authHeader: string,
   ): Promise<ReportResponseDto> {
+    const userId = await this.getUserIdFromAuth(authHeader);
     const isAdmin = await this.userClientService.isAdmin(userId);
     if (!isAdmin) {
       throw new ForbiddenException('Only admins can update report status');
@@ -51,8 +61,9 @@ export class ReportController {
   @Put(':id/resolve')
   async resolveReport(
     @Param('id') id: string,
-    @Headers('x-user-id') userId: string,
+    @Headers('authorization') authHeader: string,
   ): Promise<ReportResponseDto> {
+    const userId = await this.getUserIdFromAuth(authHeader);
     const isAdmin = await this.userClientService.isAdmin(userId);
     if (!isAdmin) {
       throw new ForbiddenException('Only admins can resolve reports');
@@ -64,8 +75,9 @@ export class ReportController {
   @Put(':id/reject')
   async rejectReport(
     @Param('id') id: string,
-    @Headers('x-user-id') userId: string,
+    @Headers('authorization') authHeader: string,
   ): Promise<ReportResponseDto> {
+    const userId = await this.getUserIdFromAuth(authHeader);
     const isAdmin = await this.userClientService.isAdmin(userId);
     if (!isAdmin) {
       throw new ForbiddenException('Only admins can reject reports');
@@ -77,8 +89,9 @@ export class ReportController {
   @Put(':id/in-progress')
   async markInProgress(
     @Param('id') id: string,
-    @Headers('x-user-id') userId: string,
+    @Headers('authorization') authHeader: string,
   ): Promise<ReportResponseDto> {
+    const userId = await this.getUserIdFromAuth(authHeader);
     const isAdmin = await this.userClientService.isAdmin(userId);
     if (!isAdmin) {
       throw new ForbiddenException('Only admins can mark reports as in progress');

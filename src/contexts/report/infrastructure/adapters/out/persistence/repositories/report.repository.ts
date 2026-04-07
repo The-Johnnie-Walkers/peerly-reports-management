@@ -23,8 +23,7 @@ export class ReportRepository {
   }
 
   async save(report: Report): Promise<Report> {
-    const document = new this.reportModel(this.reportMapper.toDocument(report));
-    const saved = await document.save();
+    const saved = await this.reportModel.create(this.reportMapper.toDocument(report));
     return this.reportMapper.toDomain(saved);
   }
 

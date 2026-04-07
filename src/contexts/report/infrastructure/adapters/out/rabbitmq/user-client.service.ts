@@ -15,7 +15,7 @@ export class UserClientService {
   async getUserRole(userId: string): Promise<UserRoleResponse> {
     try {
       const response = this.client.send(
-        { cmd: UserPatterns.GET_USER_ROLE },
+        UserPatterns.GET_USER_ROLE,
         { userId }
       );
       return response.toPromise() as Promise<UserRoleResponse>;

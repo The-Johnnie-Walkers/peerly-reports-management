@@ -3,13 +3,12 @@ import { Report } from 'src/contexts/report/domain/entities/report.entity';
 import { CreateReportRequestDto } from '../dto/request/create-report-request.dto';
 import { ReportResponseDto } from '../dto/response/report-response.dto';
 import { ReportStatus } from 'src/contexts/report/domain/enums/report-status.enum';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ReportDtoMapper {
   toDomain(dto: CreateReportRequestDto): Report {
     return new Report({
-      id: uuidv4(),
+      id: '',
       title: dto.title,
       content: dto.content,
       authorId: dto.authorId,

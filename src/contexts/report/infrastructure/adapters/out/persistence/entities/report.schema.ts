@@ -5,7 +5,7 @@ import { ReportReason, ReportType } from '../../../../../domain/enums/report-rea
 
 export type ReportDocument = HydratedDocument<ReportSchema>;
 
-@Schema({ _id: false })
+@Schema()
 export class ReportSchema {
   @Prop({ required: true })
   title: string;

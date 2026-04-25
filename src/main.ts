@@ -27,7 +27,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }));
   
   await app.startAllMicroservices();
-  await app.listen(process.env.PORT ?? 3002);
-  console.log(`Application is running on: http://localhost:${process.env.PORT ?? 3002}`);
+  await app.listen(process.env.PORT ?? 3005);
+  console.log(`Application is running on: http://localhost:${process.env.PORT ?? 3005}`);
 }
 bootstrap().catch(console.error);

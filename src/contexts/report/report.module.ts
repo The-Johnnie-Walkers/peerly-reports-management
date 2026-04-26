@@ -33,17 +33,21 @@ import { JwtHelperService } from './infrastructure/adapters/out/jwt/jwt-helper.s
       }),
       inject: [ConfigService],
     }),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'USER_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://localhost:5672'],
-          queue: 'user_queue',
-          queueOptions: {
-            durable: true,
+        imports: [ConfigModule],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.get<string>('RABBIT_MQ_URL') ?? 'amqp://localhost:5672'],
+            queue: 'user_queue',
+            queueOptions: {
+              durable: true,
+            },
           },
-        },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],

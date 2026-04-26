@@ -31,6 +31,15 @@ export class ReportSchema {
   @Prop({ type: String, nullable: true })
   idInvolvedUser: string | null;
 
+  @Prop({ type: String, nullable: true })
+  involvedUserName: string | null;
+
+  @Prop({ type: String, nullable: true })
+  involvedUserUsername: string | null;
+
+  @Prop({ type: String, nullable: true })
+  involvedUserProfilePic: string | null;
+
   @Prop({ required: true })
   updatedAt: Date;
 }

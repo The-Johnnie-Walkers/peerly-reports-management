@@ -15,6 +15,9 @@ export class ReportDtoMapper {
       reason: dto.reason,
       type: dto.type,
       idInvolvedUser: dto.idInvolvedUser || null,
+      involvedUserName: null,
+      involvedUserUsername: null,
+      involvedUserProfilePic: null,
       status: ReportStatus.PENDING,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -32,6 +35,9 @@ export class ReportDtoMapper {
       type: report.type,
       createdAt: report.createdAt,
       idInvolvedUser: report.idInvolvedUser,
+      involvedUserName: report.involvedUserName,
+      involvedUserUsername: report.involvedUserUsername,
+      involvedUserProfilePic: report.involvedUserProfilePic,
       updatedAt: report.updatedAt,
     };
   }

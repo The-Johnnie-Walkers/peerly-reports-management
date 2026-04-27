@@ -12,6 +12,9 @@ export interface ReportProps {
   type: ReportType;
   createdAt: Date;
   idInvolvedUser: string | null;
+  involvedUserName: string | null;
+  involvedUserUsername: string | null;
+  involvedUserProfilePic: string | null;
   updatedAt: Date;
 }
 
@@ -74,6 +77,24 @@ export class Report {
   }
   set idInvolvedUser(idInvolvedUser: string | null) {
     this.props.idInvolvedUser = idInvolvedUser;
+  }
+  get involvedUserName(): string | null {
+    return this.props.involvedUserName;
+  }
+  set involvedUserName(involvedUserName: string | null) {
+    this.props.involvedUserName = involvedUserName;
+  }
+  get involvedUserUsername(): string | null {
+    return this.props.involvedUserUsername;
+  }
+  set involvedUserUsername(involvedUserUsername: string | null) {
+    this.props.involvedUserUsername = involvedUserUsername;
+  }
+  get involvedUserProfilePic(): string | null {
+    return this.props.involvedUserProfilePic;
+  }
+  set involvedUserProfilePic(involvedUserProfilePic: string | null) {
+    this.props.involvedUserProfilePic = involvedUserProfilePic;
   }
 
   validateSelfReport(): boolean {

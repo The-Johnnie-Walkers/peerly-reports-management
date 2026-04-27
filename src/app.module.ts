@@ -13,7 +13,7 @@ import { ReportModule } from './contexts/report/report.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI') ?? 'mongodb://localhost:27017/peerly-reports',
+        uri: configService.get<string>('DB_URI') ?? 'mongodb://localhost:27017/peerly-reports',
       }),
       inject: [ConfigService],
     }),

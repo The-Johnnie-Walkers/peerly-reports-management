@@ -29,7 +29,7 @@ export class ReportRepository {
 
   async update(id: string, report: Report): Promise<Report> {
     const document = await this.reportModel
-      .findByIdAndUpdate(id, this.reportMapper.toDocument(report), { new: true })
+      .findByIdAndUpdate(id, { $set: this.reportMapper.toDocument(report) }, { new: true })
       .exec();
     if (!document) throw new Error('Report not found');
     return this.reportMapper.toDomain(document);

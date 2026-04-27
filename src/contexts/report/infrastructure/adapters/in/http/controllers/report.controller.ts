@@ -36,11 +36,11 @@ export class ReportController {
     return this.reportDtoMapper.toResponseList(reports);
   }
 
-  private async getUserIdFromAuth(authHeader: string): Promise<string> {
+  private getEmailFromAuth(authHeader: string): string {
     if (!authHeader) {
       throw new UnauthorizedException('Authorization header is required');
     }
-    return this.jwtHelperService.extractUserIdFromToken(authHeader);
+    return this.jwtHelperService.extractEmailFromToken(authHeader);
   }
 
   @Put(':id/status')
@@ -49,8 +49,8 @@ export class ReportController {
     @Body() updateStatusDto: UpdateReportStatusRequestDto,
     @Headers('authorization') authHeader: string,
   ): Promise<ReportResponseDto> {
-    const userId = await this.getUserIdFromAuth(authHeader);
-    const isAdmin = await this.userClientService.isAdmin(userId);
+    const email = this.getEmailFromAuth(authHeader);
+    const isAdmin = await this.userClientService.isAdmin(email);
     if (!isAdmin) {
       throw new ForbiddenException('Only admins can update report status');
     }
@@ -63,8 +63,8 @@ export class ReportController {
     @Param('id') id: string,
     @Headers('authorization') authHeader: string,
   ): Promise<ReportResponseDto> {
-    const userId = await this.getUserIdFromAuth(authHeader);
-    const isAdmin = await this.userClientService.isAdmin(userId);
+    const email = this.getEmailFromAuth(authHeader);
+    const isAdmin = await this.userClientService.isAdmin(email);
     if (!isAdmin) {
       throw new ForbiddenException('Only admins can resolve reports');
     }
@@ -77,8 +77,8 @@ export class ReportController {
     @Param('id') id: string,
     @Headers('authorization') authHeader: string,
   ): Promise<ReportResponseDto> {
-    const userId = await this.getUserIdFromAuth(authHeader);
-    const isAdmin = await this.userClientService.isAdmin(userId);
+    const email = this.getEmailFromAuth(authHeader);
+    const isAdmin = await this.userClientService.isAdmin(email);
     if (!isAdmin) {
       throw new ForbiddenException('Only admins can reject reports');
     }
@@ -91,8 +91,8 @@ export class ReportController {
     @Param('id') id: string,
     @Headers('authorization') authHeader: string,
   ): Promise<ReportResponseDto> {
-    const userId = await this.getUserIdFromAuth(authHeader);
-    const isAdmin = await this.userClientService.isAdmin(userId);
+    const email = this.getEmailFromAuth(authHeader);
+    const isAdmin = await this.userClientService.isAdmin(email);
     if (!isAdmin) {
       throw new ForbiddenException('Only admins can mark reports as in progress');
     }

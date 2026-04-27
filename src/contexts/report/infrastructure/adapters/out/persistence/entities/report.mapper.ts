@@ -15,6 +15,9 @@ export class ReportMapper {
       type: document.type,
       createdAt: document.createdAt,
       idInvolvedUser: document.idInvolvedUser,
+      involvedUserName: document.involvedUserName,
+      involvedUserUsername: document.involvedUserUsername,
+      involvedUserProfilePic: document.involvedUserProfilePic,
       updatedAt: document.updatedAt,
     });
   }
@@ -29,6 +32,9 @@ export class ReportMapper {
       type: entity.type,
       createdAt: entity.createdAt,
       idInvolvedUser: entity.idInvolvedUser,
+      involvedUserName: entity.involvedUserName,
+      involvedUserUsername: entity.involvedUserUsername,
+      involvedUserProfilePic: entity.involvedUserProfilePic,
       updatedAt: entity.updatedAt,
     };
   }

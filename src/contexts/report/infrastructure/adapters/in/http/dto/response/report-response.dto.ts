@@ -8,6 +8,9 @@ export class ReportResponseDto {
   type: string;
   createdAt: Date;
   idInvolvedUser: string | null;
+  involvedUserName: string | null;
+  involvedUserUsername: string | null;
+  involvedUserProfilePic: string | null;
   updatedAt: Date;
 }
 

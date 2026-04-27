@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEnum, IsOptional, IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
 import { ReportReason, ReportType } from 'src/contexts/report/domain/enums/report-reason.enum';
 
 export class CreateReportRequestDto {
@@ -10,7 +10,7 @@ export class CreateReportRequestDto {
   @IsNotEmpty()
   content: string;
 
-  @IsUUID()
+  @IsString()
   @IsNotEmpty()
   authorId: string;
 
@@ -22,7 +22,7 @@ export class CreateReportRequestDto {
   @IsNotEmpty()
   type: ReportType;
 
-  @IsUUID()
+  @IsString()
   @IsOptional()
   idInvolvedUser?: string | null;
 }

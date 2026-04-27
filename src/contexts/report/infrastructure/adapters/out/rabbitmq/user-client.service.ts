@@ -23,19 +23,25 @@ export class UserClientService {
 
   async getUserRole(userId: string): Promise<UserRoleResponse> {
     try {
-      const response = this.client.send(
-        UserPatterns.GET_USER_ROLE,
-        { userId }
-      );
-      return response.toPromise() as Promise<UserRoleResponse>;
+      const response = this.client.send(UserPatterns.GET_USER_ROLE, { userId });
+      return await response.toPromise() as UserRoleResponse;
     } catch (error) {
       throw new Error(`Failed to get user role: ${error.message}`);
     }
   }
 
-  async isAdmin(userId: string): Promise<boolean> {
-    const user = await this.getUserRole(userId);
-    return user.role === 'ADMIN';
+  async getUserRoleByEmail(email: string): Promise<UserRoleResponse> {
+    try {
+      const response = this.client.send(UserPatterns.GET_USER_ROLE_BY_EMAIL, { email });
+      return await response.toPromise() as UserRoleResponse;
+    } catch (error) {
+      throw new Error(`Failed to get user role by email: ${error.message}`);
+    }
+  }
+
+  async isAdmin(email: string): Promise<boolean> {
+    const user = await this.getUserRoleByEmail(email);
+    return user?.role === 'ADMIN';
   }
 
   async getUserById(userId: string): Promise<UserDataResponse | null> {

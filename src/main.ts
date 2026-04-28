@@ -19,7 +19,7 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['http://localhost:8080', 'http://localhost:5173'],
+    origin: ['http://localhost:8080', 'http://localhost:5173', `${process.env.PREPROD_URL}`, `${process.env.PROD_URL}`],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     allowedHeaders: 'Content-Type,Authorization'

@@ -18,6 +18,7 @@ import { GetAllReportsUseCaseImpl } from './application/use-cases/get-all-report
 import { UpdateReportStatusUseCaseImpl } from './application/use-cases/update-report-status-use-case.impl';
 import { UserClientService } from './infrastructure/adapters/out/rabbitmq/user-client.service';
 import { JwtHelperService } from './infrastructure/adapters/out/jwt/jwt-helper.service';
+import { NotificationsEventPublisher } from '../../notifications/notifications-event.publisher';
 
 @Module({
   imports: [
@@ -42,9 +43,20 @@ import { JwtHelperService } from './infrastructure/adapters/out/jwt/jwt-helper.s
           options: {
             urls: [configService.get<string>('RABBIT_MQ_URL') ?? 'amqp://localhost:5672'],
             queue: 'user_queue',
-            queueOptions: {
-              durable: true,
-            },
+            queueOptions: { durable: true },
+          },
+        }),
+        inject: [ConfigService],
+      },
+      {
+        name: 'NOTIFICATIONS_SERVICE',
+        imports: [ConfigModule],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.get<string>('RABBIT_MQ_URL') ?? 'amqp://localhost:5672'],
+            queue: 'notifications_queue',
+            queueOptions: { durable: true },
           },
         }),
         inject: [ConfigService],
@@ -58,6 +70,7 @@ import { JwtHelperService } from './infrastructure/adapters/out/jwt/jwt-helper.s
     ReportDtoMapper,
     UserClientService,
     JwtHelperService,
+    NotificationsEventPublisher,
     {
       provide: 'ReportRepositoryOutPortToken',
       useClass: ReportRepositoryAdapter,

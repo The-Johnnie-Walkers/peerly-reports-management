@@ -4,6 +4,7 @@ import type { ReportRepositoryOutPort } from '../../domain/ports/out/report-repo
 import type { CreateReportUseCasePort } from '../../domain/ports/in/report-use-case.port';
 import { UserClientService } from '../../infrastructure/adapters/out/rabbitmq/user-client.service';
 import { ReportType } from '../../domain/enums/report-reason.enum';
+import { NotificationsEventPublisher } from '../../../../../notifications/notifications-event.publisher';
 
 export const CREATE_REPORT_USE_CASE_TOKEN = 'CreateReportUseCaseToken';
 
@@ -13,6 +14,7 @@ export class CreateReportUseCaseImpl implements CreateReportUseCasePort {
     @Inject('ReportRepositoryOutPortToken')
     private reportRepository: ReportRepositoryOutPort,
     private userClientService: UserClientService,
+    private readonly notificationsPublisher: NotificationsEventPublisher,
   ) {}
 
   async execute(report: Report): Promise<Report> {
@@ -33,6 +35,13 @@ export class CreateReportUseCaseImpl implements CreateReportUseCasePort {
       }
     }
 
-    return await this.reportRepository.save(report);
+    const saved = await this.reportRepository.save(report);
+
+    this.notificationsPublisher.emit('notification.report.created', {
+      reportId: saved.id,
+      authorId: saved.authorId,
+    });
+
+    return saved;
   }
 }

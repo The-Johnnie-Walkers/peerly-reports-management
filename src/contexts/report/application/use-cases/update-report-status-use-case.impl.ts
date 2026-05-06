@@ -3,6 +3,7 @@ import type { Report } from '../../domain/entities/report.entity';
 import type { ReportStatus } from '../../domain/enums/report-status.enum';
 import type { ReportRepositoryOutPort } from '../../domain/ports/out/report-repository-out.port';
 import type { UpdateReportStatusUseCasePort } from '../../domain/ports/in/report-use-case.port';
+import { NotificationsEventPublisher } from '../../../../../notifications/notifications-event.publisher';
 
 export const UPDATE_REPORT_STATUS_USE_CASE_TOKEN = 'UpdateReportStatusUseCaseToken';
 
@@ -11,6 +12,7 @@ export class UpdateReportStatusUseCaseImpl implements UpdateReportStatusUseCaseP
   constructor(
     @Inject('ReportRepositoryOutPortToken')
     private reportRepository: ReportRepositoryOutPort,
+    private readonly notificationsPublisher: NotificationsEventPublisher,
   ) {}
 
   async execute(id: string, status: ReportStatus): Promise<Report> {
@@ -22,6 +24,14 @@ export class UpdateReportStatusUseCaseImpl implements UpdateReportStatusUseCaseP
     report.status = status;
     report.updatedAt = new Date();
 
-    return await this.reportRepository.update(id, report);
+    const updated = await this.reportRepository.update(id, report);
+
+    this.notificationsPublisher.emit('notification.report.status.updated', {
+      reportId: id,
+      newStatus: status,
+      authorId: report.authorId,
+    });
+
+    return updated;
   }
 }

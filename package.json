@@ -16,6 +16,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
+    "test:coverage": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
@@ -64,20 +65,33 @@
     "typescript-eslint": "^8.20.0"
   },
   "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
+    "moduleFileExtensions": ["js", "json", "ts"],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
+    "transform": { "^.+\\.(t|j)s$": ["ts-jest", { "tsconfig": "tsconfig.test.json" }] },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!**/main.ts",
+      "!**/*.module.ts",
+      "!**/*.schema.ts",
+      "!**/*.dto.ts",
+      "!**/repositories/**",
+      "!**/mappers/**",
+      "!**/messaging/**",
+      "!**/infrastructure/**",
+      "!**/enums/**",
+      "!**/domain/entities/**",
+      "!**/domain/ports/**",
+      "!**/app.controller.ts",
+      "!**/__mocks__/**",
+      "!**/notifications/**"
+    ],
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "transformIgnorePatterns": ["node_modules/(?!(uuid)/)"],
+    "moduleNameMapper": {
+      "notifications/notifications-event.publisher": "<rootDir>/__mocks__/notifications-event.publisher.ts"
+    }
   }
 }

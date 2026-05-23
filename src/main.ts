@@ -1,0 +1,33 @@
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [process.env.RABBIT_MQ_URL ?? 'amqp://localhost:5672'],
+      queue: 'reports_queue',
+      queueOptions: {
+        durable: true,
+      },
+      noAck: false,
+    },
+  });
+
+  app.enableCors({
+    origin: ['http://localhost:8080', 'http://localhost:5173', `${process.env.PREPROD_URL}`, `${process.env.PROD_URL}`],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    allowedHeaders: 'Content-Type,Authorization'
+  })
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }));
+  
+  await app.startAllMicroservices();
+  await app.listen(process.env.PORT ?? 3005);
+  console.log(`Application is running on: http://localhost:${process.env.PORT ?? 3005}`);
+}
+bootstrap().catch(console.error);
